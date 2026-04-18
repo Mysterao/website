@@ -1,1 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Singing Pendulum</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: radial-gradient(circle, #2c3e50 0%, #000000 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
 
+        #canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .container {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            pointer-events: none; /* Allows clicks to pass through to background if needed */
+        }
+
+        h1 {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 8rem;
+            letter-spacing: 0.5rem;
+            text-transform: uppercase;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+            user-select: none;
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="canvas"></canvas>
+
+    <div class="container">
+        <h1>Welcome</h1>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        let width, height;
+        let angle = 0;
+        
+        // Pendulum settings
+        const length = 300;
+        const armColor = 'rgba(255, 255, 255, 0.1)';
+        const ballColor = '#ecf0f1';
+
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        }
+
+        window.addEventListener('resize', resize);
+        resize();
+
+        function draw() {
+            // Clear with slight alpha for a motion blur "shading" effect
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            ctx.fillRect(0, 0, width, height);
+
+            const centerX = width / 2;
+            const centerY = -50; // Pivot point slightly off-screen for depth
+
+            // Physics-ish movement
+            angle = Math.sin(Date.now() * 0.002) * (Math.PI / 4);
+            
+            const x = centerX + Math.sin(angle) * (height * 0.8);
+            const y = centerY + Math.cos(angle) * (height * 0.8);
+
+            // Draw Pendulum Arm
+            ctx.beginPath();
+            ctx.moveTo(centerX, centerY);
+            ctx.lineTo(x, y);
+            ctx.strokeStyle = armColor;
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Draw Pendulum Weight (The "Singer")
+            ctx.beginPath();
+            ctx.arc(x, y, 30, 0, Math.PI * 2);
+            ctx.fillStyle = ballColor;
+            ctx.shadowBlur = 40;
+            ctx.shadowColor = 'rgba(255, 255, 255, 0.5)';
+            ctx.fill();
+            ctx.shadowBlur = 0; // Reset blur for next frame
+
+            requestAnimationFrame(draw);
+        }
+
+        draw();
+    </script>
+</body>
+</html>
